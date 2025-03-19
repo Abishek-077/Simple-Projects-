@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StudYT Pomodoro</title>
+    <style>
+        body {
+            background: #000;
+            color: #fff;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            text-align: center;
+            background: #1a1a1a;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .session-title {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .session-counter {
+            font-size: 20px;
+            font-style: italic;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        .timer {
+            font-size: 80px;
+            font-weight: bold;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: linear-gradient(45deg, #4CAF50, #2E8B57);
+            color: white;
+            font-weight: bold;
+            transition: 0.3s ease-in-out;
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            opacity: 0.9;
+        }
+
+        #startPauseBtn.running {
+            background: linear-gradient(45deg, #ff4d4d, #ff1a1a);
+        }
+
+        .settings-icon {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            font-size: 24px;
+        }
+
+        .brand {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 18px;
+            color: #fff;
+        }
+
+        /* Settings Modal Styles */
+        .settings-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #333;
+            padding: 20px;
+            border-radius: 10px;
+            z-index: 1000;
+        }
+
+        .settings-modal h3 {
+            margin-top: 0;
+            color: #fff;
+        }
+
+        .settings-modal label {
+            display: block;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .settings-modal input {
+            width: 60px;
+            padding: 5px;
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="session-title">StudYT Session</div>
+        <div class="session-counter" id="sessionCounter"><i>0/6</i></div>
+        <div class="timer" id="timerDisplay">25:00</div>
+        <div class="controls">
+            <button id="startPauseBtn">Start</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+        <div class="brand">AbilsLive</div>
+    </div>
+
+    <div class="settings-icon">⚙️</div>
+
+    <div class="settings-modal">
+        <h3>Timer Settings</h3>
+        <form id="settingsForm">
+            <label>Session Minutes: <input type="number" id="sessionLength" value="25" min="1"></label>
+            <label>Short Break: <input type="number" id="shortBreak" value="5" min="1"></label>
+            <label>Long Break: <input type="number" id="longBreak" value="15" min="1"></label>
+            <label>Total Sessions: <input type="number" id="totalSessions" value="6" min="1"></label>
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <script>
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        let currentSession = 0;
+        let totalSessions = 6;
+        let sessionDuration = 25;
+        let shortBreak = 5;
+        let longBreak = 15;
+        let isSession = true;
+
+        const timerDisplay = document.getElementById('timerDisplay');
+        const startPauseBtn = document.getElementById('startPauseBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const sessionCounter = document.getElementById('sessionCounter');
+        const settingsIcon = document.querySelector('.settings-icon');
+        const settingsModal = document.querySelector('.settings-modal');
+        const settingsForm = document.getElementById('settingsForm');
+
+        function updateDisplay(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const remainingSeconds = seconds % 60;
+            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+        }
+
+        function updateSessionCounter() {
+            sessionCounter.innerHTML = `<i>${currentSession}/${totalSessions}</i>`;
+        }
+
+        function toggleTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                startPauseBtn.textContent = 'Start';
+                startPauseBtn.classList.remove('running');
+            } else {
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay(timeLeft);
+                    } else {
+                        clearInterval(timerId);
+                        timerId = null;
+                        if (isSession) {
+                            currentSession++;
+                            updateSessionCounter();
+                            timeLeft = (currentSession % totalSessions === 0) ? longBreak * 60 : shortBreak * 60;
+                            isSession = false;
+                        } else {
+                            timeLeft = sessionDuration * 60;
+                            isSession = true;
+                        }
+                        updateDisplay(timeLeft);
+                        startPauseBtn.textContent = 'Start';
+                        startPauseBtn.classList.remove('running');
+                    }
+                }, 1000);
+                startPauseBtn.textContent = 'Pause';
+                startPauseBtn.classList.add('running');
+            }
+        }
+
+        // Settings functionality
+        settingsIcon.addEventListener('click', () => {
+            settingsModal.style.display = 'block';
+        });
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            sessionDuration = parseInt(document.getElementById('sessionLength').value);
+            shortBreak = parseInt(document.getElementById('shortBreak').value);
+            longBreak = parseInt(document.getElementById('longBreak').value);
+            totalSessions = parseInt(document.getElementById('totalSessions').value);
+
+            timeLeft = sessionDuration * 60;
+            currentSession = 0;
+            isSession = true;
+
+            updateDisplay(timeLeft);
+            updateSessionCounter();
+            settingsModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+        });
+
+        // Reset functionality
+        resetBtn.addEventListener('click', () => {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = sessionDuration * 60;
+            currentSession = 0;
+            isSession = true;
+            updateDisplay(timeLeft);
+            updateSessionCounter();
+            startPauseBtn.textContent = 'Start';
+            startPauseBtn.classList.remove('running');
+        });
+
+        startPauseBtn.addEventListener('click', toggleTimer);
+
+        // Initialize display
+        updateDisplay(timeLeft);
+        updateSessionCounter();
+    </script>
+</body>
+</html>
