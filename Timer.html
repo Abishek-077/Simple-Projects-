@@ -14,73 +14,56 @@
             align-items: center;
             margin: 0;
             padding: 20px;
+            position: relative;
+            height: 100vh;
         }
 
         .container {
             text-align: center;
-            background: transparent; /* Fully transparent background */
+            background: transparent;
             padding: 30px;
-            border-radius: 0; /* For sharp corners */
+            border-radius: 0;
             box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            position: absolute;
-            width: 500px; /* Adjust this value for width */
-            height: 300px; /* Adjust this value for height */
+            width: 500px;
+            height: 300px;
+            position: relative;
         }
         
         .session-title {
-            position: relative;
-            font-size: 50px; /* Larger size for better visibility */
+            font-size: 50px;
             margin-bottom: 10px;
-            color: #fff;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 3px; /* Slightly more spacing for a modern look */
-            background: linear-gradient(45deg, #00FFFF, #00BFFF); /* Soft Blue Gradient */
-            -webkit-background-clip: text;
             color: transparent;
-            text-shadow: 0 0 15px rgba(0, 255, 255, 0.8), 0 0 25px rgba(0, 255, 255, 0.6); /* Soft Blue Glow */
-            animation: glowEffect 1.5s ease-in-out infinite alternate; /* Glowing animation */
+            background: linear-gradient(45deg, #00FFFF, #00BFFF);
+            -webkit-background-clip: text;
+            text-shadow: 0 0 15px rgba(0, 255, 255, 0.8);
+            animation: glowEffect 1.5s ease-in-out infinite alternate;
         }
-        
-        /* Animation for the glowing effect */
+
         @keyframes glowEffect {
-            0% {
-                text-shadow: 0 0 5px rgba(0, 255, 255, 0.8), 0 0 10px rgba(0, 255, 255, 0.6);
-            }
-            100% {
-                text-shadow: 0 0 20px rgba(0, 255, 255, 1), 0 0 40px rgba(0, 255, 255, 1);
-            }
+            0% { text-shadow: 0 0 5px rgba(0, 255, 255, 0.8); }
+            100% { text-shadow: 0 0 20px rgba(0, 255, 255, 1); }
         }
         
-        
-       
         .session-counter {
-            position: relative;
-            font-size: 50px; /* Increased size */
-            font-style: italic;
-            margin-bottom: 1px;
+            font-size: 20px;
+            margin-bottom: 10px;
             color: #ddd;
-            top: 180px;
         }
 
         .timer {
-            position: relative;
-            font-size: 100px; /* Increased size */
+            font-size: 100px;
             font-weight: bold;
             margin: 20px 0;
             color: #fff;
-
         }
 
         .controls {
             display: flex;
             gap: 15px;
             justify-content: center;
-            margin-bottom: 20px;
         }
 
         button {
-            position: relative;
             padding: 12px 25px;
             font-size: 18px;
             border: none;
@@ -90,75 +73,35 @@
             color: white;
             font-weight: bold;
             transition: 0.3s ease-in-out;
-            top: 100px;
         }
 
         button:hover {
             transform: scale(1.1);
             opacity: 0.9;
         }
-
-      
+        
         .settings-icon {
-            position: absolute;
+            position: fixed;
             top: 20px;
             right: 20px;
             cursor: pointer;
             font-size: 24px;
         }
 
-    .brand {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    color: #fff;
-    text-transform: uppercase;
-    animation: glow 1.5s infinite alternate, wave 3s infinite ease-in-out;
-    background: linear-gradient(45deg, #ff416c, #ff4b2b, #ff416c);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-/* Glowing effect */
-@keyframes glow {
-    0% {
-        text-shadow: 0 0 5px #ff416c, 0 0 10px #ff4b2b, 0 0 15px #ff416c;
-    }
-    100% {
-        text-shadow: 0 0 10px #ff416c, 0 0 15px #ff4b2b, 0 0 20px #ff416c;
-    }
-}
-
-/* Floating wave effect */
-@keyframes wave {
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
-    100% { transform: translateY(0); }
-}
-
-        /* Settings Modal Styles */
         .settings-modal {
             display: none;
-            position: fixed;
-            top: 50%;
+            position: relative;
+            top: 10%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: #333;
             padding: 20px;
             border-radius: 10px;
             z-index: 1000;
+            text-align: center;
         }
 
-        .settings-modal h3 {
-            margin-top: 0;
-            color: #fff;
-        }
-
-        .settings-modal label {
-            display: block;
-            margin: 10px 0;
+        .settings-modal h3, .settings-modal label {
             color: #fff;
         }
 
@@ -178,12 +121,11 @@
             <button id="startPauseBtn">Start</button>
             <button id="resetBtn">Reset</button>
         </div>
-       
     </div>
 
     <div class="settings-icon">⚙️</div>
 
-    <div class="settings-modal">
+    <div class="settings-modal" id="settingsModal">
         <h3>Timer Settings</h3>
         <form id="settingsForm">
             <label>Session Minutes: <input type="number" id="sessionLength" value="25" min="1"></label>
@@ -195,85 +137,12 @@
     </div>
 
     <script>
-        let timeLeft = 25 * 60;
-        let timerId = null;
-        let currentSession = 0;
-        let totalSessions = 6;
-        let sessionDuration = 25;
-        let shortBreak = 5;
-        let longBreak = 15;
-        let isSession = true;
-
-        const timerDisplay = document.getElementById('timerDisplay');
-        const startPauseBtn = document.getElementById('startPauseBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const sessionCounter = document.getElementById('sessionCounter');
         const settingsIcon = document.querySelector('.settings-icon');
-        const settingsModal = document.querySelector('.settings-modal');
+        const settingsModal = document.getElementById('settingsModal');
         const settingsForm = document.getElementById('settingsForm');
 
-        function updateDisplay(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
-        }
-
-        function updateSessionCounter() {
-            sessionCounter.innerHTML = `<i>${currentSession}/${totalSessions}</i>`;
-        }
-
-        function toggleTimer() {
-            if (timerId) {
-                clearInterval(timerId);
-                timerId = null;
-                startPauseBtn.textContent = 'Start';
-                startPauseBtn.classList.remove('running');
-            } else {
-                timerId = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        updateDisplay(timeLeft);
-                    } else {
-                        clearInterval(timerId);
-                        timerId = null;
-                        if (isSession) {
-                            currentSession++;
-                            updateSessionCounter();
-                            timeLeft = (currentSession % totalSessions === 0) ? longBreak * 60 : shortBreak * 60;
-                            isSession = false;
-                        } else {
-                            timeLeft = sessionDuration * 60;
-                            isSession = true;
-                        }
-                        updateDisplay(timeLeft);
-                        startPauseBtn.textContent = 'Start';
-                        startPauseBtn.classList.remove('running');
-                    }
-                }, 1000);
-                startPauseBtn.textContent = 'Pause';
-                startPauseBtn.classList.add('running');
-            }
-        }
-
-        // Settings functionality
         settingsIcon.addEventListener('click', () => {
             settingsModal.style.display = 'block';
-        });
-
-        settingsForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            sessionDuration = parseInt(document.getElementById('sessionLength').value);
-            shortBreak = parseInt(document.getElementById('shortBreak').value);
-            longBreak = parseInt(document.getElementById('longBreak').value);
-            totalSessions = parseInt(document.getElementById('totalSessions').value);
-
-            timeLeft = sessionDuration * 60;
-            currentSession = 0;
-            isSession = true;
-
-            updateDisplay(timeLeft);
-            updateSessionCounter();
-            settingsModal.style.display = 'none';
         });
 
         window.addEventListener('click', (e) => {
@@ -281,25 +150,6 @@
                 settingsModal.style.display = 'none';
             }
         });
-
-        // Reset functionality
-        resetBtn.addEventListener('click', () => {
-            clearInterval(timerId);
-            timerId = null;
-            timeLeft = sessionDuration * 60;
-            currentSession = 0;
-            isSession = true;
-            updateDisplay(timeLeft);
-            updateSessionCounter();
-            startPauseBtn.textContent = 'Start';
-            startPauseBtn.classList.remove('running');
-        });
-
-        startPauseBtn.addEventListener('click', toggleTimer);
-
-        // Initialize display
-        updateDisplay(timeLeft);
-        updateSessionCounter();
     </script>
 </body>
 </html>
