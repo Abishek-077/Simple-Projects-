@@ -176,7 +176,9 @@
     </style>
 </head>
 <body>
-    <audio id="alarmSound" src="alramSound.wav"></audio>
+    <!-- Change this line -->
+<!-- Add preload attribute to ensure audio is loaded -->
+<audio id="alarmSound" src="alarmSound.wav" preload="auto"></audio>
     <div class="container">
         <div class="session-title">
             <span class="abiis">ABIIS</span><span class="live">LIVE</span>
@@ -203,43 +205,86 @@
     </div>
 
     <script>
-        const alarmSound = document.getElementById('alarmSound');
+       // Add this at the top of your script section
+let audioContextAllowed = false;
 
-        function toggleTimer() {
-            if (timerId) {
+// Add this click handler to initialize audio context
+document.body.addEventListener('click', () => {
+    if (!audioContextAllowed) {
+        // Resume audio context on first user interaction
+        const alarmSound = document.getElementById('alarmSound');
+        if (alarmSound) {
+            alarmSound.play().then(() => {
+                alarmSound.pause();
+                alarmSound.currentTime = 0;
+                audioContextAllowed = true;
+            }).catch(error => {
+                console.error('Audio playback failed:', error);
+            });
+        }
+    }
+}, { once: true });
+
+function toggleTimer() {
+    if (timerId) {
+        clearInterval(timerId);
+        timerId = null;
+        startPauseBtn.textContent = 'Start';
+        startPauseBtn.classList.remove('running');
+    } else {
+        // Initialize audio context on first click
+        if (!window.audioContextInitialized) {
+            const alarmSound = document.getElementById('alarmSound');
+            alarmSound.play().then(() => {
+                alarmSound.pause();
+                alarmSound.currentTime = 0;
+                window.audioContextInitialized = true;
+            }).catch(error => {
+                console.error('Audio initialization failed:', error);
+            });
+        }
+
+        timerId = setInterval(() => {
+            if (timeLeft > 0) {
+                timeLeft--;
+                updateDisplay(timeLeft);
+            } else {
                 clearInterval(timerId);
                 timerId = null;
+
+                // Play sound with proper handling
+                const alarmSound = document.getElementById('alarmSound');
+                try {
+                    alarmSound.currentTime = 0; // Reset to start
+                    alarmSound.play();
+                } catch (error) {
+                    console.error('Sound playback failed:', error);
+                }
+
+                // Session handling logic
+                if (isSession) {
+                    currentSession++;
+                    updateSessionCounter();
+                    timeLeft = (currentSession % totalSessions === 0) 
+                        ? longBreak * 60 
+                        : shortBreak * 60;
+                    isSession = false;
+                } else {
+                    timeLeft = sessionDuration * 60;
+                    isSession = true;
+                }
+
+                updateDisplay(timeLeft);
                 startPauseBtn.textContent = 'Start';
                 startPauseBtn.classList.remove('running');
-            } else {
-                timerId = setInterval(() => {
-                    if (timeLeft > 0) {
-                        timeLeft--;
-                        updateDisplay(timeLeft);
-                    } else {
-                        clearInterval(timerId);
-                        timerId = null;
-                        alarmSound.play(); // Play alarm sound
-        
-                        if (isSession) {
-                            currentSession++;
-                            updateSessionCounter();
-                            timeLeft = (currentSession % totalSessions === 0) ? longBreak * 60 : shortBreak * 60;
-                            isSession = false;
-                        } else {
-                            timeLeft = sessionDuration * 60;
-                            isSession = true;
-                        }
-                        
-                        updateDisplay(timeLeft);
-                        startPauseBtn.textContent = 'Start';
-                        startPauseBtn.classList.remove('running');
-                    }
-                }, 1000);
-                startPauseBtn.textContent = 'Pause';
-                startPauseBtn.classList.add('running');
             }
-        }
+        }, 1000);
+        startPauseBtn.textContent = 'Pause';
+        startPauseBtn.classList.add('running');
+    }
+}
+
+
         
         let timeLeft = 25 * 60;
         let timerId = null;
