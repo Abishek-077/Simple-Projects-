@@ -176,6 +176,7 @@
     </style>
 </head>
 <body>
+    <audio id="alarmSound" src="alramSound.wav"></audio>
     <div class="container">
         <div class="session-title">
             <span class="abiis">ABIIS</span><span class="live">LIVE</span>
@@ -202,6 +203,44 @@
     </div>
 
     <script>
+        const alarmSound = document.getElementById('alarmSound');
+
+        function toggleTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                startPauseBtn.textContent = 'Start';
+                startPauseBtn.classList.remove('running');
+            } else {
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay(timeLeft);
+                    } else {
+                        clearInterval(timerId);
+                        timerId = null;
+                        alarmSound.play(); // Play alarm sound
+        
+                        if (isSession) {
+                            currentSession++;
+                            updateSessionCounter();
+                            timeLeft = (currentSession % totalSessions === 0) ? longBreak * 60 : shortBreak * 60;
+                            isSession = false;
+                        } else {
+                            timeLeft = sessionDuration * 60;
+                            isSession = true;
+                        }
+                        
+                        updateDisplay(timeLeft);
+                        startPauseBtn.textContent = 'Start';
+                        startPauseBtn.classList.remove('running');
+                    }
+                }, 1000);
+                startPauseBtn.textContent = 'Pause';
+                startPauseBtn.classList.add('running');
+            }
+        }
+        
         let timeLeft = 25 * 60;
         let timerId = null;
         let currentSession = 0;
@@ -308,5 +347,8 @@
         updateDisplay(timeLeft);
         updateSessionCounter();
     </script>
+    
+
+
 </body>
 </html>
