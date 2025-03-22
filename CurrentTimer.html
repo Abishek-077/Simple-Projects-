@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-Time Clock</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;700&display=swap');
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: transparent; /* Fully Transparent */
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            text-align: center;
+        }
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2); /* Soft shadow for better visibility */
+            backdrop-filter: blur(10px); /* Light blur effect */
+            transition: transform 0.3s ease-in-out;
+        }
+        .clock-container:hover {
+            transform: scale(1.05);
+        }
+        .clock {
+            font-size: 5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-shadow: 4px 4px 10px rgba(0, 0, 0, 0.7); /* Glow effect for better readability */
+        }
+        .date {
+            font-size: 2rem;
+            font-weight: 400;
+            margin-top: 10px;
+            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Slight glow */
+        }
+    </style>
+</head>
+<body>
+    <div class="clock-container">
+        <div class="clock" id="clock"></div>
+        <div class="date" id="date"></div>
+    </div>
+
+    <script>
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('clock').innerText = now.toLocaleTimeString();
+            document.getElementById('date').innerText = now.toDateString();
+        }
+        setInterval(updateTime, 1000);
+        updateTime();
+    </script>
+</body>
+</html>

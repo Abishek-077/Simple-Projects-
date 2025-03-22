@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Banner</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #0d0d0d;
+        }
+
+        .banner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            width: 90%;
+            max-width: 1000px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffcc00, #ffdd44);
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(255, 204, 0, 0.3);
+            animation: slideIn 1s ease-in-out;
+        }
+
+        .social {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: black;
+            text-decoration: none;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .social img {
+            width: 40px;
+            height: 40px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+            position: relative;
+            animation: floatAnimation 3s infinite ease-in-out;
+        }
+
+        .social:hover {
+            transform: scale(1.1);
+            color: white;
+        }
+
+        .social:hover img {
+            transform: scale(1.2);
+            filter: brightness(1.2);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes floatAnimation {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+            100% {
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="banner">
+        <a href="https://instagram.com/yourhandle" class="social">
+            <img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram">
+            @ABIXSHEK0777
+        </a>
+
+        <a href="https://youtube.com/yourchannel" class="social">
+            <img src="https://cdn-icons-png.flaticon.com/512/1384/1384060.png" alt="YouTube">
+            @Abishek_0777
+        </a>
+
+        <a href="https://facebook.com/yourprofile" class="social">
+            <img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook">
+            Abi Xop
+        </a>
+
+        <a href="https://discord.com/invite/yourdiscord" class="social">
+            <img src="https://cdn-icons-png.flaticon.com/512/5968/5968756.png" alt="Discord">
+            #Abi IsLive
+        </a>
+    </div>
+
+</body>
+</html>
